@@ -18,9 +18,12 @@ Laravel 12, PHP 8.3. Everything runs inside the `app` container (no local PHP ne
 - Start: `docker compose up --build` -> http://localhost:8000
 - Tests: `docker compose exec app php artisan test`
 - Artisan / Composer: `docker compose exec app php artisan <cmd>`, `docker compose exec app composer <cmd>`
+- Frontend assets: `docker compose exec app npm run build` (rebuild after changing Blade/CSS/JS)
 - Stop: `docker compose down`
 
-On start, `docker/entrypoint.sh` installs vendor (if missing), creates `.env` from `.env.example`, generates `APP_KEY`, creates `database/database.sqlite` and runs migrations.
+On start, `docker/entrypoint.sh` installs vendor and `node_modules` (if missing), builds frontend assets (if `public/build` is missing), creates `.env` from `.env.example`, generates `APP_KEY`, creates `database/database.sqlite` and runs migrations.
+
+Auth is Laravel Breeze (Blade stack, Tailwind 3, Alpine.js). Tests use Pest.
 
 ## Folder structure
 Standard Laravel 12 layout (`app/`, `routes/`, `resources/`, `database/`, `tests/`, ...), plus:
