@@ -7,6 +7,14 @@ if [ ! -f vendor/autoload.php ]; then
     composer install --no-interaction --prefer-dist
 fi
 
+if [ ! -d node_modules ]; then
+    npm ci
+fi
+
+if [ ! -f public/build/manifest.json ]; then
+    npm run build
+fi
+
 if [ ! -f .env ]; then
     cp .env.example .env
 fi
