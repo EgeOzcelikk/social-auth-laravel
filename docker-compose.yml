@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    image: social-auth-laravel-app
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount the source so code changes are visible without rebuilding the image.
+      - .:/var/www/html
