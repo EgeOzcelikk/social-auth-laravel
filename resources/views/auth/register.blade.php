@@ -49,4 +49,6 @@
             </x-primary-button>
         </div>
     </form>
+
+    <x-social-login-buttons />
 </x-guest-layout>
