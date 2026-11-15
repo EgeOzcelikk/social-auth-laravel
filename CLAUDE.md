@@ -1,5 +1,14 @@
 # CLAUDE.md
 
+## Why this project
+My old version (LaraForm) doesn't work properly and I don't want a broken project on my GitHub. Priority: a fully working, clean, well-tested result. Polish what exists before adding new features.
+
+## Scope
+1. Core first: skeleton, Breeze email/password login, Google + GitHub OAuth, CI, README. Each step ships with its own Pest tests; the CI step adds GitHub Actions.
+2. Only after the core is fully working, add these extras, one branch each, each with its own tests:
+   connected accounts page (link/unlink providers), profile photo, two-factor authentication (TOTP), live demo deployment.
+3. Anything outside this list needs an explicit decision first.
+
 ## Project
 From-scratch rewrite of an earlier internship project (LaraForm). Social login with Laravel + Socialite, using Docker and SQLite.
 This is a portfolio project: a clean commit history and tests matter.
