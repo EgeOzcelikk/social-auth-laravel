@@ -26,6 +26,11 @@ The question behind the rewrite: **how do you add social login to a Laravel app 
   - **New provider, existing email:** linked to the existing account only if the provider says the email is verified **and** the local account has a verified email. This blocks pre-account hijacking (someone registers your email with a password, then waits for you to log in with Google).
   - **Unknown email:** a new user is created with the email already marked as verified.
   - Provider access tokens are **not stored**, because the app only needs the identity, not API access to the user's Google or GitHub account.
+- **Connected accounts** (section on the profile page): logged-in users can connect or disconnect Google and GitHub.
+  - Connecting reuses the login callback URL (a GitHub OAuth app allows only one). If the user is logged in, the callback connects the account instead of logging in. No email match is needed, because the user controls both accounts at that moment.
+  - At most one account per provider per user (unique on `user_id + provider`). A provider account that belongs to another user is refused.
+  - Only users with a verified email can connect accounts (same pre-account hijacking guard as above).
+  - Disconnecting is scoped to the user's own accounts (another user's account ID returns 404). The last login method cannot be removed: a user without a password must keep at least one provider.
 - **Tests:** Pest feature tests for every step, including the OAuth flows (Socialite is mocked, so tests never call Google or GitHub).
 - **CI:** GitHub Actions runs the full test suite on every push and on every pull request to `main`.
 
@@ -97,7 +102,7 @@ docker compose down                          # stop the app
 
 ## Limitations
 
-- **No page to manage connected accounts yet.** Users cannot see, link or unlink providers from the UI; linking happens only through login by matching email.
+- **Connecting an account needs no re-authentication.** Anyone with access to an open, logged-in session can connect their own Google or GitHub account to it. A stronger app would ask for the password (or an email code for OAuth-only users) first. This is out of scope for this project.
 - **Unverified password accounts are not auto-linked.** If you registered with a password but never verified your email, "Continue with Google" with the same email is refused. You have to verify your email or log in with your password first. This is on purpose (see Approach).
 - **OAuth-only users have no password.** They can set one through "Forgot your password?".
 - **No real email delivery.** Emails go to the log file; a real mail provider is needed for production.
