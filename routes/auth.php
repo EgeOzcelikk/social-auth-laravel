@@ -36,11 +36,11 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 
     Route::get('auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
-        ->whereIn('provider', SocialiteController::PROVIDERS)
+        ->whereIn('provider', array_keys(SocialiteController::PROVIDERS))
         ->name('socialite.redirect');
 
     Route::get('auth/{provider}/callback', [SocialiteController::class, 'callback'])
-        ->whereIn('provider', SocialiteController::PROVIDERS)
+        ->whereIn('provider', array_keys(SocialiteController::PROVIDERS))
         ->name('socialite.callback');
 });
 

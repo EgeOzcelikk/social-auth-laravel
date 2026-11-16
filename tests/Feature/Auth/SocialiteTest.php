@@ -121,7 +121,7 @@ test('a github account without a verified email is rejected', function () {
 
     $this->get('/auth/github/callback')
         ->assertRedirect(route('login'))
-        ->assertSessionHasErrors('oauth');
+        ->assertSessionHasErrors(['oauth' => 'Your GitHub account has no verified email address.']);
 
     $this->assertGuest();
     expect(User::count())->toBe(0);
@@ -130,11 +130,11 @@ test('a github account without a verified email is rejected', function () {
 test('a failed provider callback redirects to login with an error', function () {
     $driver = Mockery::mock(Provider::class);
     $driver->shouldReceive('user')->andThrow(new InvalidStateException);
-    Socialite::shouldReceive('driver')->with('google')->andReturn($driver);
+    Socialite::shouldReceive('driver')->with('github')->andReturn($driver);
 
-    $this->get('/auth/google/callback')
+    $this->get('/auth/github/callback')
         ->assertRedirect(route('login'))
-        ->assertSessionHasErrors('oauth');
+        ->assertSessionHasErrors(['oauth' => 'Login with GitHub failed. Please try again.']);
 
     $this->assertGuest();
 });
