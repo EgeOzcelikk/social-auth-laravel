@@ -31,7 +31,8 @@ class SocialiteController extends Controller
     }
 
     /**
-     * Handle the provider's response and log the user in.
+     * Handle the provider's response: log a guest in, or connect the
+     * provider account to the user who is already logged in.
      */
     public function callback(string $provider): RedirectResponse
     {
@@ -45,7 +46,13 @@ class SocialiteController extends Controller
                 'message' => $e->getMessage(),
             ]);
 
-            return $this->failed(__('Login with :provider failed. Please try again.', ['provider' => self::PROVIDERS[$provider]]));
+            return Auth::check()
+                ? $this->connectFailed(__('Connecting :provider failed. Please try again.', ['provider' => self::PROVIDERS[$provider]]))
+                : $this->failed(__('Login with :provider failed. Please try again.', ['provider' => self::PROVIDERS[$provider]]));
+        }
+
+        if (Auth::check()) {
+            return $this->connect(Auth::user(), $provider, $providerUser);
         }
 
         // Returning user: the provider account is already linked.
@@ -91,6 +98,46 @@ class SocialiteController extends Controller
     }
 
     /**
+     * Connect the provider account to the logged-in user.
+     * No email match is needed: the user is logged in here and just
+     * logged in at the provider, so they control both accounts.
+     */
+    private function connect(User $user, string $provider, ProviderUser $providerUser): RedirectResponse
+    {
+        $name = self::PROVIDERS[$provider];
+
+        // Same pre-account hijacking guard as in login: an attacker could register
+        // the victim's email, connect their own provider account, and keep access
+        // after the real owner takes the account back with "Forgot password".
+        if (! $user->hasVerifiedEmail()) {
+            return $this->connectFailed(__('Please verify your email address before connecting accounts.'));
+        }
+
+        $account = SocialAccount::where('provider', $provider)
+            ->where('provider_id', $providerUser->getId())
+            ->first();
+
+        if ($account && $user->is($account->user)) {
+            return $this->connected(__(':provider account is already connected.', ['provider' => $name]));
+        }
+
+        if ($account) {
+            return $this->connectFailed(__('This :provider account is already connected to another user.', ['provider' => $name]));
+        }
+
+        if ($user->socialAccounts()->where('provider', $provider)->exists()) {
+            return $this->connectFailed(__('You already have a :provider account connected. Disconnect it first.', ['provider' => $name]));
+        }
+
+        $user->socialAccounts()->create([
+            'provider' => $provider,
+            'provider_id' => $providerUser->getId(),
+        ]);
+
+        return $this->connected(__(':provider account connected.', ['provider' => $name]));
+    }
+
+    /**
      * Return the provider email only if the provider says it is verified.
      */
     private function verifiedEmail(string $provider, ProviderUser $providerUser): ?string
@@ -116,5 +163,15 @@ class SocialiteController extends Controller
     private function failed(string $message): RedirectResponse
     {
         return redirect()->route('login')->withErrors(['oauth' => $message]);
+    }
+
+    private function connected(string $message): RedirectResponse
+    {
+        return redirect()->route('profile.edit')->with('social-status', $message);
+    }
+
+    private function connectFailed(string $message): RedirectResponse
+    {
+        return redirect()->route('profile.edit')->withErrors(['social' => $message]);
     }
 }

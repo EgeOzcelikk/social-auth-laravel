@@ -55,4 +55,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(SocialAccount::class);
     }
+
+    /**
+     * A provider account may only be disconnected if another login method remains.
+     */
+    public function canDisconnectSocialAccount(): bool
+    {
+        return $this->password !== null || $this->socialAccounts()->count() > 1;
+    }
 }

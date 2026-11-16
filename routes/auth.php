@@ -34,15 +34,17 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
-
-    Route::get('auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
-        ->whereIn('provider', array_keys(SocialiteController::PROVIDERS))
-        ->name('socialite.redirect');
-
-    Route::get('auth/{provider}/callback', [SocialiteController::class, 'callback'])
-        ->whereIn('provider', array_keys(SocialiteController::PROVIDERS))
-        ->name('socialite.callback');
 });
+
+// Open to guests (log in) and logged-in users (connect an account).
+// One shared callback URL, because a GitHub OAuth app allows only one.
+Route::get('auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
+    ->whereIn('provider', array_keys(SocialiteController::PROVIDERS))
+    ->name('socialite.redirect');
+
+Route::get('auth/{provider}/callback', [SocialiteController::class, 'callback'])
+    ->whereIn('provider', array_keys(SocialiteController::PROVIDERS))
+    ->name('socialite.callback');
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
