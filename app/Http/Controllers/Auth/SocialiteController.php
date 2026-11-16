@@ -17,9 +17,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse
 class SocialiteController extends Controller
 {
     /**
-     * OAuth providers users can log in with. Routes reject any other value.
+     * OAuth providers users can log in with (route value => display name).
+     * Routes reject any other value.
      */
-    public const PROVIDERS = ['google', 'github'];
+    public const PROVIDERS = ['google' => 'Google', 'github' => 'GitHub'];
 
     /**
      * Send the user to the provider's consent screen.
@@ -44,7 +45,7 @@ class SocialiteController extends Controller
                 'message' => $e->getMessage(),
             ]);
 
-            return $this->failed(__('Login with :provider failed. Please try again.', ['provider' => ucfirst($provider)]));
+            return $this->failed(__('Login with :provider failed. Please try again.', ['provider' => self::PROVIDERS[$provider]]));
         }
 
         // Returning user: the provider account is already linked.
@@ -59,7 +60,7 @@ class SocialiteController extends Controller
         $email = $this->verifiedEmail($provider, $providerUser);
 
         if ($email === null) {
-            return $this->failed(__('Your :provider account has no verified email address.', ['provider' => ucfirst($provider)]));
+            return $this->failed(__('Your :provider account has no verified email address.', ['provider' => self::PROVIDERS[$provider]]));
         }
 
         $user = User::where('email', $email)->first();
