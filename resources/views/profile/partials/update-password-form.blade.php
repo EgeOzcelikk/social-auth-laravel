@@ -9,13 +9,6 @@
         </p>
     </header>
 
-    @if ($user->password === null)
-    {{-- OAuth-only users have no current password to enter. The email reset flow
-         sets one safely, because it proves the user owns the inbox. --}}
-    <p class="mt-6 text-sm text-gray-600">
-        {{ __('You log in with Google or GitHub, so your account has no password for this app. To add one, log out and use "Forgot your password?" on the login page.') }}
-    </p>
-    @else
     <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
         @csrf
         @method('put')
@@ -52,5 +45,4 @@
             @endif
         </div>
     </form>
-    @endif
 </section>
