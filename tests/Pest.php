@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Socialite\Contracts\Provider;
+use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\User as ProviderUser;
 use Tests\TestCase;
 
 /*
@@ -44,7 +47,15 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Make Socialite return the given provider user on callback, without any HTTP call.
+ */
+function fakeProviderUser(string $provider, array $attributes, array $raw = []): void
 {
-    // ..
+    $providerUser = (new ProviderUser)->setRaw($raw)->map($attributes);
+
+    $driver = Mockery::mock(Provider::class);
+    $driver->shouldReceive('user')->andReturn($providerUser);
+
+    Socialite::shouldReceive('driver')->with($provider)->andReturn($driver);
 }
