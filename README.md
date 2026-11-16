@@ -104,7 +104,7 @@ docker compose down                          # stop the app
 
 - **Connecting an account needs no re-authentication.** Anyone with access to an open, logged-in session can connect their own Google or GitHub account to it. A stronger app would ask for the password (or an email code for OAuth-only users) first. This is out of scope for this project.
 - **Unverified password accounts are not auto-linked.** If you registered with a password but never verified your email, "Continue with Google" with the same email is refused. You have to verify your email or log in with your password first. This is on purpose (see Approach).
-- **OAuth-only users have no password.** They can set one through "Forgot your password?".
+- **OAuth-only users have no password.** They can set one through "Forgot your password?" (the profile page explains this instead of showing the "Update Password" form). To delete their account, they type their email address instead of a password. This only guards against deleting by accident; it is not a real re-authentication.
 - **No real email delivery.** Emails go to the log file; a real mail provider is needed for production.
 - **Development setup only.** The Docker setup uses `php artisan serve` and is not meant for production. There is no live demo yet.
 - **Only Google and GitHub.** Other providers need a config entry, an allowlist entry and a button.
