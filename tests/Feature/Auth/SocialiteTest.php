@@ -4,20 +4,6 @@ use App\Models\User;
 use Laravel\Socialite\Contracts\Provider;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
-use Laravel\Socialite\Two\User as ProviderUser;
-
-/**
- * Make Socialite return the given provider user on callback, without any HTTP call.
- */
-function fakeProviderUser(string $provider, array $attributes, array $raw = []): void
-{
-    $providerUser = (new ProviderUser)->setRaw($raw)->map($attributes);
-
-    $driver = Mockery::mock(Provider::class);
-    $driver->shouldReceive('user')->andReturn($providerUser);
-
-    Socialite::shouldReceive('driver')->with($provider)->andReturn($driver);
-}
 
 test('login and register pages show the social login buttons', function (string $page) {
     $this->get($page)
