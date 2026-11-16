@@ -100,6 +100,20 @@ test('the delete dialog asks oauth-only users to type their email', function () 
         ->assertDontSee('Please enter the password for this app');
 });
 
+test('oauth-only users see how to add a password instead of the update password form', function () {
+    $this->actingAs(User::factory()->create(['password' => null]))
+        ->get('/profile')
+        ->assertSee('your account has no password for this app')
+        ->assertDontSee(route('password.update'));
+});
+
+test('password users see the update password form', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/profile')
+        ->assertSee(route('password.update'))
+        ->assertDontSee('your account has no password for this app');
+});
+
 test('an oauth-only user can delete their account by typing their email', function () {
     $user = User::factory()->create(['email' => 'ada@example.com', 'password' => null]);
     $account = $user->socialAccounts()->create(['provider' => 'github', 'provider_id' => '42']);
