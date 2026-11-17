@@ -13,6 +13,12 @@
                 </div>
             </div>
 
+            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                <div class="max-w-xl">
+                    @include('profile.partials.update-profile-photo-form')
+                </div>
+            </div>
+
             {{-- The form needs the current password, which OAuth-only users don't have. --}}
             @if ($user->password !== null)
                 <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">

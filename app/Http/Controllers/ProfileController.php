@@ -64,6 +64,9 @@ class ProfileController extends Controller
 
         $user->delete();
 
+        // Don't leave an orphaned file on disk.
+        $user->deleteProfilePhotoFile();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

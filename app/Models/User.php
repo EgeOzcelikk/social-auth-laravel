@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -54,6 +55,24 @@ class User extends Authenticatable implements MustVerifyEmail
     public function socialAccounts(): HasMany
     {
         return $this->hasMany(SocialAccount::class);
+    }
+
+    /**
+     * Public URL of the profile photo, or null if the user has none.
+     */
+    public function profilePhotoUrl(): ?string
+    {
+        return $this->avatar_path ? Storage::disk('public')->url($this->avatar_path) : null;
+    }
+
+    /**
+     * Delete the profile photo file from disk (the caller saves or deletes the model).
+     */
+    public function deleteProfilePhotoFile(): void
+    {
+        if ($this->avatar_path) {
+            Storage::disk('public')->delete($this->avatar_path);
+        }
     }
 
     /**
