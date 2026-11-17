@@ -29,4 +29,9 @@ fi
 
 php artisan migrate --force
 
+# Makes uploaded profile photos (storage/app/public) reachable under /storage.
+if [ ! -L public/storage ]; then
+    php artisan storage:link
+fi
+
 exec "$@"
