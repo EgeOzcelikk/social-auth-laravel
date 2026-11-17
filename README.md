@@ -115,6 +115,10 @@ docker compose down                          # stop the app
 - **Profile photos are not resized.** Photos are stored as uploaded (up to 2 MB) and only scaled down by CSS. Resizing would need an image library (GD or Intervention Image). The Google/GitHub avatar is not used either.
 - **Only Google and GitHub.** Other providers need a config entry, an allowlist entry and a button.
 
+## Possible extensions
+
+- **Two-factor authentication (TOTP).** Users would scan a QR code with an authenticator app (`pragmarx/google2fa` for the codes, `bacon/bacon-qr-code` for an SVG QR code) and confirm it with a first code before 2FA turns on, so a broken setup cannot lock them out. The secret and single-use recovery codes would be stored with Laravel's `encrypted` cast. After a correct password, the user would not be logged in yet: a rate-limited challenge page would ask for a code first. The challenge must also run after Google/GitHub login, otherwise OAuth would be a way around 2FA. Turning 2FA off would need a current code, because OAuth-only users have no password to confirm. It was left out to keep the project focused: there is no real user data to protect here.
+
 ## License
 
 [MIT](LICENSE)
