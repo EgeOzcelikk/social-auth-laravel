@@ -74,6 +74,14 @@ test('invalid files are rejected', function (UploadedFile $file) {
     'svg' => fn () => fakePhoto('logo.svg', 10, 'image/svg+xml'),
 ]);
 
+test('the size error is shown in megabytes', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post('/profile/photo', ['photo' => fakePhoto('big.jpg', 2049)])
+        ->assertSessionHasErrorsIn('updatePhoto', ['photo' => 'The photo must not be larger than 2 MB.']);
+});
+
 test('a photo is required', function () {
     $user = User::factory()->create();
 

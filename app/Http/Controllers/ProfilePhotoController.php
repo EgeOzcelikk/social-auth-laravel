@@ -16,6 +16,8 @@ class ProfilePhotoController extends Controller
         $request->validateWithBag('updatePhoto', [
             // "image" + "mimes" check the real file content, not the name the client sent.
             'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'photo.max' => __('The photo must not be larger than 2 MB.'),
         ]);
 
         $user = $request->user();
