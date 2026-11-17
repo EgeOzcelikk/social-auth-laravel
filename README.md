@@ -111,9 +111,13 @@ docker compose down                          # stop the app
 - **Unverified password accounts are not auto-linked.** If you registered with a password but never verified your email, "Continue with Google" with the same email is refused. You have to verify your email or log in with your password first. This is on purpose (see Approach).
 - **OAuth-only users have no password.** The "Update Password" form is hidden for them (it needs the current password); as a backup login they can connect a second provider, or set a password through "Forgot your password?". To delete their account, they type their email address instead of a password. This only guards against deleting by accident; it is not a real re-authentication.
 - **No real email delivery.** Emails go to the log file; a real mail provider is needed for production.
-- **Development setup only.** The Docker setup uses `php artisan serve` and is not meant for production. There is no live demo yet.
+- **Development setup only.** The Docker setup uses `php artisan serve` and is not meant for production. There is no live demo.
 - **Profile photos are not resized.** Photos are stored as uploaded (up to 2 MB) and only scaled down by CSS. Resizing would need an image library (GD or Intervention Image). The Google/GitHub avatar is not used either.
 - **Only Google and GitHub.** Other providers need a config entry, an allowlist entry and a button.
+
+## Possible extensions
+
+- **Two-factor authentication (TOTP).** Users would scan a QR code with an authenticator app (`pragmarx/google2fa` for the codes, `bacon/bacon-qr-code` for an SVG QR code) and confirm it with a first code before 2FA turns on, so a broken setup cannot lock them out. The secret and single-use recovery codes would be stored with Laravel's `encrypted` cast. After a correct password, the user would not be logged in yet: a rate-limited challenge page would ask for a code first. The challenge must also run after Google/GitHub login, otherwise OAuth would be a way around 2FA. Turning 2FA off would need a current code, because OAuth-only users have no password to confirm. It was left out to keep the project focused: there is no real user data to protect here.
 
 ## License
 
