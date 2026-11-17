@@ -31,6 +31,11 @@ The question behind the rewrite: **how do you add social login to a Laravel app 
   - At most one account per provider per user (unique on `user_id + provider`). A provider account that belongs to another user is refused.
   - Only users with a verified email can connect accounts (same pre-account hijacking guard as above).
   - Disconnecting is scoped to the user's own accounts (another user's account ID returns 404). The last login method cannot be removed: a user without a password must keep at least one provider.
+- **Profile photo** (section on the profile page): users can upload (JPG, PNG or WebP, max 2 MB) or remove a photo.
+  - The file is stored on Laravel's `public` disk (`storage/app/public/avatars`) under a random name; the database only keeps its path (`users.avatar_path`). The container runs `storage:link` on start so the files are served under `/storage`.
+  - The file type is checked from the file content, not from the name the browser sends. SVG is not accepted (it can contain scripts).
+  - The old file is deleted when a new photo is uploaded, when the photo is removed and when the account is deleted, so no orphaned files stay on disk.
+  - Users without a photo see the first letter of their name instead.
 - **Tests:** Pest feature tests for every step, including the OAuth flows (Socialite is mocked, so tests never call Google or GitHub).
 - **CI:** GitHub Actions runs the full test suite on every push and on every pull request to `main`.
 
@@ -107,6 +112,7 @@ docker compose down                          # stop the app
 - **OAuth-only users have no password.** The "Update Password" form is hidden for them (it needs the current password); as a backup login they can connect a second provider, or set a password through "Forgot your password?". To delete their account, they type their email address instead of a password. This only guards against deleting by accident; it is not a real re-authentication.
 - **No real email delivery.** Emails go to the log file; a real mail provider is needed for production.
 - **Development setup only.** The Docker setup uses `php artisan serve` and is not meant for production. There is no live demo yet.
+- **Profile photos are not resized.** Photos are stored as uploaded (up to 2 MB) and only scaled down by CSS. Resizing would need an image library (GD or Intervention Image). The Google/GitHub avatar is not used either.
 - **Only Google and GitHub.** Other providers need a config entry, an allowlist entry and a button.
 
 ## License
